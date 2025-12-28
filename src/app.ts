@@ -47,6 +47,7 @@ app.get("/projects", async (_req, res) => {
 		where: { isPublished: true },
 		orderBy: { sortOrder: "asc" },
 	});
+	res.json({ route: "works" });
 	res.json(projects);
 });
 
