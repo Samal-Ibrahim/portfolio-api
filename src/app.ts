@@ -36,6 +36,10 @@ app.use(
 	}),
 );
 
+app.get("/", (_req, res) => {
+	res.json({ message: "Welcome to my Portfolio API" });
+});
+
 /* health */
 app.get("/health", (_req, res) => {
 	res.json({ ok: true });
