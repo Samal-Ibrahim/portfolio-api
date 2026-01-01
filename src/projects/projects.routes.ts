@@ -15,18 +15,13 @@ router.get(
 		const page = Number.parseInt(req.query.page as string, 10) || 1;
 		const limit = Number.parseInt(req.query.limit as string, 10) || 10;
 		const skip = (page - 1) * limit;
-		const publishedOnly = req.query.published === "true";
-
-		// Build where clause
-		const where = publishedOnly ? { isPublished: true } : {};
 
 		// Get total count for pagination metadata
-		const totalCount = await prisma.project.count({ where });
+		const totalCount = await prisma.project.count();
 
 		// Fetch projects with pagination
 		const projects = await prisma.project.findMany({
-			where,
-			orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+			orderBy: { createdAt: "desc" },
 			skip,
 			take: limit,
 		});
@@ -47,10 +42,7 @@ router.get(
 					github: project.githubUrl,
 				},
 				metadata: {
-					isPublished: project.isPublished,
-					sortOrder: project.sortOrder,
 					createdAt: project.createdAt,
-					updatedAt: project.updatedAt,
 				},
 			})),
 			pagination: {
