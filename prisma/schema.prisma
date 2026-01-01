@@ -9,15 +9,15 @@ datasource db {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Project {
+model Projectz {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  description String?
+  description String
   githubUrl   String?  @map("github_url")
   liveUrl     String?  @map("live_url")
-  tags        String[] @default([])
+  technologies String[] @default([])
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  imageUrl    String?  @map("image_url")
+  isPublished Boolean
 
   @@map("projects")
 }

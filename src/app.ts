@@ -87,6 +87,7 @@ app.get(
 					metadata: {
 						createdAt: project.createdAt,
 					},
+					isPublished: true,
 				})),
 				pagination: {
 					currentPage: page,
@@ -125,6 +126,36 @@ app.post(
 		});
 
 		res.status(201).json(created);
+	}),
+);
+
+app.put(
+	"/projects/:id",
+	asyncHandler(async (req, res) => {
+		const { id } = req.params;
+		const { title, description, imageUrl, githubUrl, liveUrl, technologies } = req.body;
+
+		const project = await prisma.project.findUnique({
+			where: { id },
+		});
+
+		if (!project) {
+			throw new ValidationError("Project not found");
+		}
+
+		const updated = await prisma.project.update({
+			where: { id },
+			data: {
+				title,
+				description,
+				imageUrl,
+				githubUrl,
+				liveUrl,
+				tech: technologies || [],
+			},
+		});
+
+		res.json(updated);
 	}),
 );
 

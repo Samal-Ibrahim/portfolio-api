@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "Project" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "tech" TEXT[] DEFAULT ARRAY[]::TEXT[],
