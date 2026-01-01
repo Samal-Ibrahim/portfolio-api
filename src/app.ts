@@ -26,7 +26,6 @@ app.use(
 	}),
 );
 
-
 app.use(
 	rateLimit({
 		windowMs: 15 * 60 * 1000,
@@ -43,8 +42,6 @@ app.get("/health", (_req, res) => {
 	res.json({ ok: true });
 });
 
-
-
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -54,16 +51,15 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-
 /* public */
 app.get("/projects", async (_req, res) => {
 	try {
 		const { data, error } = await supabase
 			.from("projects")
 			.select("*")
-			.order("sortOrder", { ascending: true })
 			.order("created_at", { ascending: false });
 
+		console.log(data);
 		if (error) {
 			logger.error(error, "Error fetching projects from Supabase");
 			return res.status(500).json({ error: "Failed to fetch projects" });
@@ -72,10 +68,11 @@ app.get("/projects", async (_req, res) => {
 		return res.json({ projects: data, count: data.length });
 	} catch (error) {
 		logger.error(error, "Unexpected error fetching projects");
-		return res.status(500).json({ error: "Unexpected error fetching projects" });
+		return res
+			.status(500)
+			.json({ error: "Unexpected error fetching projects" });
 	}
 });
-
 
 app.post("/projects", async (req, res) => {
 	const { title, description, image_url, github_url, live_url, tags } =
