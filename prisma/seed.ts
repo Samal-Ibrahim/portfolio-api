@@ -1,7 +1,7 @@
 import { prisma } from "../src/db";
 
 async function main() {
-	await prisma.project.createMany({
+	await prisma.projects.createMany({
 		data: [
 			{
 				title: "Portfolio API",
@@ -11,14 +11,12 @@ async function main() {
 				imageUrl: "https://placehold.co/1200x630/png",
 				liveUrl: "https://your-live-site.com",
 				githubUrl: "https://github.com/FransoArbela/portfolio-api",
-				sortOrder: 1,
+				isPublished: true,
 			},
 		],
 		skipDuplicates: true,
 	});
 }
-
-
 
 main()
 	.catch((e) => {
