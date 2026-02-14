@@ -5,6 +5,7 @@ import { UnauthorizedError } from "../errors/AppError";
 export function requireAdmin(req: Request, _res: Response, next: NextFunction) {
 	const token = req.cookies.token;
 
+
 	if (!token) {
 		throw new UnauthorizedError();
 	}

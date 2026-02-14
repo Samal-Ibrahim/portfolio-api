@@ -20,10 +20,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 		throw new Error("Server configuration error: ADMIN_PASSWORD not set");
 	}
 
-	const valid = await bcrypt.compare(
-		password,
-		await bcrypt.hash(adminPassword, 10),
-	);
+	const valid = await bcrypt.compare(password, adminPassword || "");
 
 	if (!valid) {
 		throw new UnauthorizedError("Invalid credentials");
@@ -41,10 +38,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 	res.cookie("token", token, {
 		httpOnly: true,
 		sameSite: "lax",
-		secure: process.env.NODE_ENV === "production",
+		secure: false,
 	});
 
-	res.json({ ok: true });
+	res.json({ token: token });
 });
 
 export const me = asyncHandler(async (req: Request, res: Response) => {

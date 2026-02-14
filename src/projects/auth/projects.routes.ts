@@ -1,16 +1,15 @@
 import { Router } from "express";
-import { requireAdmin } from "../auth/auth.middleware";
-import { prisma } from "../db";
-import { NotFoundError, ValidationError } from "../errors/AppError";
-import { logger } from "../logger";
-import { asyncHandler } from "../utils/asyncHandler";
-
+import { requireAdmin } from "../../auth/auth.middleware";
+import { prisma } from "../../db";
+import { NotFoundError, ValidationError } from "../../errors/AppError";
+import { logger } from "../../logger";
+import { asyncHandler } from "../../utils/asyncHandler";
 
 const router = Router();
 
 // Get ALL projects (including drafts)
 router.get(
-	"/",
+	"/d",
 	requireAdmin,
 	asyncHandler(async (req, res) => {
 		try {
@@ -40,9 +39,9 @@ router.get(
 					id: project.id,
 					title: project.title,
 					description: project.description,
-					technologies: {
-						tech: project.tech,
-					},
+
+					tech: project.tech,
+
 					images: {
 						thumbnail: project.imageUrl,
 					},
@@ -68,103 +67,6 @@ router.get(
 			logger.error(error, "Error in GET /projects");
 			throw error;
 		}
-	}),
-);
-
-router.get(
-	"/public",
-	asyncHandler(async (req, res) => {
-		try {
-			// Parse query parameters for pagination
-			const page = Number.parseInt(req.query.page as string, 10) || 1;
-			const limit = Number.parseInt(req.query.limit as string, 10) || 10;
-			const skip = (page - 1) * limit;
-
-			logger.info({ page, limit, skip }, "Fetching projects");
-
-			// Get total count for pagination
-			const totalCount = await prisma.projects.count();
-			logger.info({ totalCount }, "Total count fetched");
-
-			// Fetch projects with pagination
-			const projects = await prisma.projects.findMany({
-				orderBy: { createdAt: "desc" },
-				skip,
-				take: limit,
-			});
-			logger.info({ projectsCount: projects.length }, "Projects fetched");
-
-			// Structure the response
-			res.json({
-				success: true,
-				data: projects.map((project) => ({
-					id: project.id,
-					title: project.title,
-					description: project.description,
-					technologies: {
-						tech: project.tech,
-					},
-					images: {
-						thumbnail: project.imageUrl,
-					},
-					links: {
-						live: project.liveUrl,
-						github: project.githubUrl,
-					},
-					metadata: {
-						createdAt: project.createdAt,
-					},
-					isPublished: true,
-				})),
-				pagination: {
-					currentPage: page,
-					totalPages: Math.ceil(totalCount / limit),
-					totalCount,
-					perPage: limit,
-					hasNextPage: page < Math.ceil(totalCount / limit),
-					hasPreviousPage: page > 1,
-				},
-			});
-		} catch (error) {
-			logger.error(error, "Error in GET /projects");
-			throw error;
-		}
-	}),
-);
-
-router.get(
-	"/public/:id",
-	requireAdmin,
-	asyncHandler(async (req, res) => {
-		const { id } = req.params;
-
-		const project = await prisma.projects.findUnique({
-			where: { id },
-		});
-
-		if (!project) {
-			throw new ValidationError("Project not found");
-		}
-
-		res.json({
-			id: project.id,
-			title: project.title,
-			description: project.description,
-			technologies: {
-				tech: project.tech,
-			},
-			images: {
-				thumbnail: project.imageUrl,
-			},
-			links: {
-				live: project.liveUrl,
-				github: project.githubUrl,
-			},
-			metadata: {
-				createdAt: project.createdAt,
-			},
-			isPublished: true,
-		});
 	}),
 );
 
@@ -200,8 +102,7 @@ router.put(
 	requireAdmin,
 	asyncHandler(async (req, res) => {
 		const { id } = req.params;
-		const { title, description, imageUrl, githubUrl, liveUrl, tech } =
-			req.body;
+		const { title, description, imageUrl, githubUrl, liveUrl, tech } = req.body;
 
 		const project = await prisma.projects.findUnique({
 			where: { id },

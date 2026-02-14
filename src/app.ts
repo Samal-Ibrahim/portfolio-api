@@ -7,7 +7,8 @@ import pinoHttp from "pino-http";
 import authRoutes from "./auth/auth.routes";
 import { errorHandler, notFoundHandler } from "./errors/errorHandler";
 import { logger } from "./logger";
-import adminProjectsRoutes from "./projects/projects.routes";
+import adminProjectsRoutes from "./projects/auth/projects.routes";
+import publicProjectsRoutes from "./projects/public/projects.routes";
 
 const app = express();
 
@@ -42,12 +43,10 @@ app.get("/health", (_req, res) => {
 	res.json({ ok: true });
 });
 
-
-
 /* auth + admin */
 app.use("/auth", authRoutes);
 app.use("/admin/projects", adminProjectsRoutes);
-
+app.use("/projects", publicProjectsRoutes); // Public projects route
 
 /* error handlers - must be last */
 app.use(notFoundHandler);
